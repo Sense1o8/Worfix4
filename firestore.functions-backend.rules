@@ -1,0 +1,85 @@
+rules_version = '2';
+// WORFIX Firestore security rules.
+// STATUS: written, NOT yet run against the Firestore emulator (unavailable when this was built).
+// Run `firebase emulators:exec` rule tests before production — see SECURITY.md.
+//
+// Principles
+//  * Role/status/XP/rewards/verification are NEVER client-writable; Cloud Functions (Admin SDK) write them.
+//  * Sensitive fields (trustScore, fraudScore, AI score) live in separate *Private docs readable only by staff.
+//  * Roles are read from the caller's own users/{uid} doc, never from request data.
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return get(/databases/$(db)/documents/users/$(request.auth.uid)).data; }
+    function active() { return signedIn() && me().status == 'active'; }
+    function isAdmin() { return active() && me().role in ['admin', 'super_admin']; }
+    function isOrgStaff(orgId) { return active() && me().role == 'organization' && me().organizationId == orgId; }
+    function onlyChanges(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+
+    // ── users: owners edit profile fields only ──
+    match /users/{uid} {
+      allow read: if active() && (request.auth.uid == uid || isAdmin());
+      allow create, delete: if false;                       // createUserProfile function / account deletion function
+      allow update: if active() && request.auth.uid == uid &&
+        onlyChanges(['fullName','username','avatar','bio','country','city','languages','skills','interests','onboarded','updatedAt']) &&
+        request.resource.data.fullName is string && request.resource.data.fullName.size() >= 2 && request.resource.data.fullName.size() <= 80 &&
+        request.resource.data.bio.size() <= 280;
+    }
+    match /userPrivate/{uid} { allow read: if isAdmin(); allow write: if false; }   // trustScore, reputation
+
+    // ── organizations ──
+    match /organizations/{id} {
+      allow read: if resource.data.verificationStatus == 'approved' || isOrgStaff(id) || isAdmin();
+      allow create, delete: if false;
+      allow update: if isOrgStaff(id) && resource.data.ownerId == request.auth.uid &&
+        onlyChanges(['name','logo','description','website','email','phone','address','country','city','organizationType']);
+    }
+
+    // ── missions: public when published; all writes via functions (rewards are server-computed) ──
+    match /missions/{id} {
+      allow read: if resource.data.status == 'published' || isOrgStaff(resource.data.organizationId) || isAdmin();
+      allow write: if false;
+    }
+
+    // ── participation ──
+    match /missionParticipants/{id} {
+      allow read: if active() && (resource.data.userId == request.auth.uid || isAdmin() ||
+        isOrgStaff(get(/databases/$(db)/documents/missions/$(resource.data.missionId)).data.organizationId));
+      allow write: if false;                                // joinMission / leaveMission / decideParticipant
+    }
+
+    // ── submissions: volunteer reads own; staff of the owning org + admins read; writes via functions ──
+    match /missionSubmissions/{id} {
+      allow read: if active() && (resource.data.userId == request.auth.uid || isOrgStaff(resource.data.organizationId) || isAdmin());
+      allow write: if false;
+    }
+    match /submissionPrivate/{id} {                         // fraudScore, fraudFlags, aiConfidence — staff only
+      allow read: if active() && (isAdmin() || isOrgStaff(get(/databases/$(db)/documents/missionSubmissions/$(id)).data.organizationId));
+      allow write: if false;
+    }
+    match /verificationRecords/{id} {
+      allow read: if isAdmin() || (active() && isOrgStaff(get(/databases/$(db)/documents/missionSubmissions/$(resource.data.submissionId)).data.organizationId));
+      allow write: if false;
+    }
+
+    // ── certificates: owner reads own; public verification goes through a function that returns a safe snapshot ──
+    match /certificates/{id} {
+      allow read: if active() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    // ── notifications: owner reads and may only flip `read` ──
+    match /notifications/{id} {
+      allow read: if active() && resource.data.userId == request.auth.uid;
+      allow update: if active() && resource.data.userId == request.auth.uid && onlyChanges(['read']);
+      allow create, delete: if false;
+    }
+
+    // ── audit log: admins read; nobody writes from a client; entries are immutable ──
+    match /auditLogs/{id} { allow read: if isAdmin(); allow write: if false; }
+
+    // ── Phase 2/3 collections stay closed until their features ship ──
+    match /{other=**} { allow read, write: if false; }
+  }
+}

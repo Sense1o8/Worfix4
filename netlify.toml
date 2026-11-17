@@ -1,0 +1,22 @@
+# WORFIX on Netlify. The Next.js app lives in web/; Netlify detects Next.js and installs its
+# runtime automatically (pages are pre-rendered, /api/ai/missions runs as a serverless function).
+#
+# Set these in Netlify → Site configuration → Environment variables BEFORE the first deploy:
+#   GEMINI_API_KEY                 server-only, powers the AI mission agent
+#   NEXT_PUBLIC_FIREBASE_*         the six values from Firebase console → Project settings → Your apps (web)
+# Without the Firebase values the site still deploys, in "Local demo mode".
+[build]
+  base = "web"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(self), camera=(self)"

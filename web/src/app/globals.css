@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* ── WORFIX design tokens ─────────────────────────────────────────────
+   Forest Green = primary (actions, success) · Sky Blue = secondary (info, AI, maps, analytics)
+   Sunrise Orange = accent (XP, rewards, badges). All text pairs verified ≥ 4.5:1 (see DESIGN_SYSTEM.md). */
+:root {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-2: #f2f4ef;
+  --border: #e2e6dd;
+  --border-strong: #6f7f75; /* form controls: ≥ 3:1 against surface (WCAG 1.4.11) */
+  --text: #14201a;
+  --muted: #4a5a50;
+
+  --primary: #1b6b43;
+  --primary-hover: #155636;
+  --on-primary: #ffffff;
+  --primary-soft: #e3f2e9;
+  --on-primary-soft: #11452b;
+
+  --secondary: #1a6fa3;
+  --secondary-soft: #e4f2fa;
+  --on-secondary-soft: #0f4f76;
+
+  --accent: #b8470a;
+  --accent-fill: #f59a3e;
+  --on-accent-fill: #3a1a00;
+  --accent-soft: #fff0df;
+  --on-accent-soft: #8f3706;
+
+  --warning-soft: #fff4d6;
+  --on-warning-soft: #6b4500;
+  --error: #b3261e;
+  --error-soft: #fdecea;
+  --on-error-soft: #8c1d18;
+
+  --ring: #1a6fa3;
+  --shadow-low: 0 1px 2px rgb(20 32 26 / 0.06);
+  --shadow-med: 0 4px 12px rgb(20 32 26 / 0.08);
+  --shadow-high: 0 12px 32px rgb(20 32 26 / 0.12);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e1411;
+  --surface: #151d18;
+  --surface-2: #1c2620;
+  --border: #2a372f;
+  --border-strong: #6c8074;
+  --text: #eaf1ec;
+  --muted: #a3b3a9;
+
+  --primary: #4cba82;
+  --primary-hover: #66c995;
+  --on-primary: #062314;
+  --primary-soft: #14301f;
+  --on-primary-soft: #9fe0bd;
+
+  --secondary: #6bb6e8;
+  --secondary-soft: #12303f;
+  --on-secondary-soft: #a9d8f5;
+
+  --accent: #ffa654;
+  --accent-fill: #ffa654;
+  --on-accent-fill: #2b1400;
+  --accent-soft: #3a2410;
+  --on-accent-soft: #ffcb99;
+
+  --warning-soft: #36290a;
+  --on-warning-soft: #f2c14e;
+  --error: #ff8a80;
+  --error-soft: #3b1816;
+  --on-error-soft: #ffb4ad;
+
+  --ring: #6bb6e8;
+  --shadow-low: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-med: 0 4px 12px rgb(0 0 0 / 0.4);
+  --shadow-high: 0 12px 32px rgb(0 0 0 / 0.5);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-on-primary-soft: var(--on-primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-on-secondary-soft: var(--on-secondary-soft);
+  --color-accent: var(--accent);
+  --color-accent-fill: var(--accent-fill);
+  --color-on-accent-fill: var(--on-accent-fill);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent-soft: var(--on-accent-soft);
+  --color-warning-soft: var(--warning-soft);
+  --color-on-warning-soft: var(--on-warning-soft);
+  --color-error: var(--error);
+  --color-error-soft: var(--error-soft);
+  --color-on-error-soft: var(--on-error-soft);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-low: var(--shadow-low);
+  --shadow-med: var(--shadow-med);
+  --shadow-high: var(--shadow-high);
+}
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  min-width: 320px;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+}
+
+/* Visible focus for every interactive element (WCAG 2.4.7 / 2.4.11) */
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Type scale: hero / h1 / h2 / h3 / subtitle / body-lg / body / small / caption */
+.t-hero { font-size: clamp(2.5rem, 7vw, 4.5rem); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; }
+.t-h1 { font-size: clamp(1.875rem, 4vw, 2.5rem); line-height: 1.1; letter-spacing: -0.025em; font-weight: 700; }
+.t-h2 { font-size: 1.5rem; line-height: 1.2; letter-spacing: -0.02em; font-weight: 650; }
+.t-h3 { font-size: 1.125rem; line-height: 1.3; letter-spacing: -0.01em; font-weight: 600; }
+.t-sub { font-size: 1.125rem; line-height: 1.55; color: var(--muted); }
+.t-small { font-size: 0.875rem; line-height: 1.45; }
+.t-caption { font-size: 0.75rem; line-height: 1.4; letter-spacing: 0.02em; }
+
+/* Reduced motion: keep state changes, drop movement */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* Print: only the certificate (Save as PDF from the browser print dialog) */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; inset: 0; margin: 0; box-shadow: none !important; }
+}

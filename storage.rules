@@ -1,0 +1,21 @@
+rules_version = '2';
+// Evidence uploads: owner-only write to evidence/{uid}/…, images only, ≤ 8 MB. Reads happen through
+// short-lived signed URLs issued by functions to the owner, the owning organization, and admins.
+// STATUS: written, not yet run on the emulator.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /evidence/{uid}/{file} {
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.size <= 8 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+      allow read, update, delete: if false;
+    }
+    match /avatars/{uid}/{file} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid
+        && request.resource.size <= 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+    }
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}

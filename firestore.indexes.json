@@ -1,0 +1,16 @@
+{
+  "indexes": [
+    { "collectionGroup": "missions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "date", "order": "ASCENDING" }] },
+    { "collectionGroup": "missions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "category", "order": "ASCENDING" }, { "fieldPath": "date", "order": "ASCENDING" }] },
+    { "collectionGroup": "missions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "organizationId", "order": "ASCENDING" }, { "fieldPath": "date", "order": "DESCENDING" }] },
+    { "collectionGroup": "missionParticipants", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "userId", "order": "ASCENDING" }, { "fieldPath": "joinedAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "missionParticipants", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "missionId", "order": "ASCENDING" }, { "fieldPath": "joinedAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "missionSubmissions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "organizationId", "order": "ASCENDING" }, { "fieldPath": "verificationStatus", "order": "ASCENDING" }, { "fieldPath": "timestamp", "order": "DESCENDING" }] },
+    { "collectionGroup": "missionSubmissions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "verificationStatus", "order": "ASCENDING" }, { "fieldPath": "timestamp", "order": "DESCENDING" }] },
+    { "collectionGroup": "missionSubmissions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "userId", "order": "ASCENDING" }, { "fieldPath": "timestamp", "order": "DESCENDING" }] },
+    { "collectionGroup": "notifications", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "userId", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "certificates", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "userId", "order": "ASCENDING" }, { "fieldPath": "issuedAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "auditLogs", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "actor", "order": "ASCENDING" }, { "fieldPath": "timestamp", "order": "DESCENDING" }] }
+  ],
+  "fieldOverrides": []
+}
